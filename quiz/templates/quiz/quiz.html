@@ -1,0 +1,84 @@
+<!--Had to get rid of the style.css for this because it was cutting off the questions and I couldn't figure out where it was messing up-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Take the Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(120deg, coral, #93FFe0);
+            margin: 0;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 40px 0 20px;
+            font-size: 36px;
+            color: black;
+        }
+
+        form {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .question-block {
+            background-color: #93FFe0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        label.option {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            display: block;
+            margin: 40px auto 60px;
+            padding: 14px 28px;
+            font-size: 18px;
+            background-color: coral;
+            color: #93FFe0;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #ff7a4d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Time to take your quiz!</h1>
+
+    <form method="post" action="{% url 'quiz:submit_quiz' %}">
+        {% csrf_token %}
+
+        {% for question in questions %}
+            <div class="question-block">
+                <div class="question-text">{{ forloop.counter }}. {{ question.text }}</div>
+                {% for option in question.option_list %}
+                    <label class="option">
+                        <input type="radio" name="question_{{ question.qnum }}" value="{{ option }}"> {{ option }}
+                    </label>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="submit-btn">Submit Quiz</button>
+    </form>
+</body>
+</html>

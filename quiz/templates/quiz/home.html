@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Home</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(120deg, coral, #93FFe0);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .home-content {
+            color: #000;
+        }
+
+        .home-content h1 {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .home-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .home-content button, .home-content a {
+            background: coral;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            margin: 6px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .home-content a {
+            background: none;
+            color: #93FFe0;
+            font-weight: normal;
+        }
+
+        .home-content button:hover {
+            background: #ff8050;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-content">
+        <h1>Welcome to the Quiz App</h1>
+
+        {% if user.is_authenticated %}
+            <p>Hello, {{ user.username }}!</p>
+            <form action="{% url 'quiz:start_quiz' %}" method="get">
+                <button type="submit">Take Quiz</button>
+            </form>
+
+            {% if user.is_staff %}
+            <br>
+            <a href="{% url 'quiz:manage_questions' %}">Manage Questions (Admin)</a>
+            <a href="{% url 'quiz:manage_users' %}">Manage Users (Admin)</a>
+            {% endif %}
+
+            <br>
+            <a href="{% url 'quiz:logout' %}">Logout</a>
+
+        {% else %}
+            <a href="{% url 'quiz:login' %}">Login</a>
+            <a href="{% url 'quiz:register' %}">Register</a>
+        {% endif %}
+    </div>
+</body>
+</html>

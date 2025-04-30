@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h1>Manage Users</h1>
+    <a href="{% url 'quiz:home' %}">⬅ Back to Home</a>
+    <ul>
+        {% for user in users %}
+            <li>
+                <strong>{{ user.username }}</strong> ({{ user.email }})
+                {% if not user.is_staff %}
+                <form method="post" action="{% url 'quiz:delete_user' user.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Are you sure you want to delete this user?')">🗑️ Delete</button>
+                </form>
+                <form method="post" action="{% url 'quiz:promote_user' user.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Promote this user to admin?')">⬆️ Promote</button>
+                </form>                
+                {% else %}
+                    <span>👑 Admin</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No users found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

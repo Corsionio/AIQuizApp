@@ -1,0 +1,157 @@
+<!--Login/Signup inspired by the YouTube video linked here: https://www.youtube.com/watch?v=A2gb-qS3f-8&list=PLdcAJH2F2ReXZaPuM9Cxm0dNk3Zp5Hjkh-->
+{% load static %}
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login/Register Slide</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css'}">
+        <style>
+            *{
+                box-sizing: border-box
+            }
+
+            body {
+                font-family: 'Segoe UI', sans-serif;
+                background: linear-gradient(120deg, coral, #93FFe0);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }
+
+            .container {
+                background-color:coral;
+                width: 360px;
+                border-radius: 15px;
+                overflow: hidden;
+                box-shadow: 0 0 20px rgba(0,0,0,0.4);
+                position: relative;
+            }
+
+            .form-container {
+                width: 200%;
+                display: flex;
+                transition: transform 0.5s ease-in-out;
+            }
+
+            .form-box {
+                width: 50%;
+                padding: 40px 30px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .form-box h2 {
+                margin-bottom: 20px;
+                color: #93FFe0;
+            }
+
+            .form-box input {
+                width: 100%;
+                margin: 10px 0;
+                padding: 12px;
+                border: none;
+                border-radius: 5px;
+                background: #f2f2f2;
+            }
+
+            .form-box button {
+                width: 100%;
+                margin-top: 20px;
+                padding: 12px;
+                background: #93FFe0;
+                color: coral;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .form-box button:hover {
+                background: #4cffcc;
+            }
+
+            .toggle-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                background: coral;
+                padding: 5px;
+                border-top: 1px solid coral;
+                cursor: pointer;
+                font-weight: bold;
+                color: #93FFe0;
+            }
+
+            .form-box .errorlist {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                color: red;
+                font-size: 0.85em;
+                width: 100%;
+                text-align: left;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="form-container" id="formContainer">
+              <!-- Sign up Form -->
+              <form class="form-box" id="registerBox" method="post" action="{% url 'quiz:auth' %}">
+                {% csrf_token %}
+                <h2>Sign Up</h2>
+                {{ register_form.username }}
+                {{ register_form.email }}
+                {{ register_form.password1 }}
+                {{ register_form.password2 }}
+
+                <!-- Throw error for user -->
+                {% if register_form.errors %}
+                <div style="color: red;">
+                    {{ register_form.errors}}
+                </div>
+                {% endif %}
+                <button type="submit">Sign Up</button>
+              </form>
+        
+              <!-- Login Form -->
+              <form class="form-box" id="loginBox" method="post" action="{% url 'quiz:auth' %}">
+                {% csrf_token %}
+                <h2>Login</h2>
+                {{ login_form.username }}
+                {{ login_form.password }}
+                <button type="submit">Login</button>
+              </form>
+            </div>
+        
+            <!-- Toggle Button -->
+            <div class="toggle-container" onclick="toggleForm()" id="toggleBtn">
+              Already have an account? Login
+            </div>
+
+        </div>
+        
+        <script>
+        let showingLogin = false;
+        function toggleForm() {
+            const formContainer = document.getElementById('formContainer');
+            const toggleBtn = document.getElementById('toggleBtn');
+            showingLogin = !showingLogin;
+            formContainer.style.transform = showingLogin ? 'translateX(-50%)' : 'translateX(0)';
+            toggleBtn.textContent = showingLogin
+            ? "Don't have an account? Sign Up"
+            : "Already have an account? Login";
+        }
+        </script>
+    </body>
+
+</html>
