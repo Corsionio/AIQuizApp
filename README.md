@@ -1,5 +1,7 @@
 # Databases
 
+Transferred from original github project to this one for app deployment
+
 Run by doing: py manage.py runserver
 
 If you want to create a new db do: 
