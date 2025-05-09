@@ -5,7 +5,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("OPENAI_API_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-default-for-dev")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 DEBUG = True
 
