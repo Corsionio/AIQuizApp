@@ -62,12 +62,12 @@ def create_tables():
             user_id INTEGER NOT NULL,
             qnum_id INTEGER NOT NULL,
             vote INTEGER NOT NULL CHECK(vote IN (0, 1)),
-            UNIQUE(user_id, qnum_id),
+            attempt_id INTEGER NOT NULL,
             FOREIGN KEY(user_id) REFERENCES quiz_user(id) ON DELETE CASCADE,
-            FOREIGN KEY(qnum_id) REFERENCES quiz_question(qnum) ON DELETE CASCADE
+            FOREIGN KEY(qnum_id) REFERENCES quiz_question(qnum) ON DELETE CASCADE,
+            FOREIGN KEY(attempt_id) REFERENCES quiz_quizattempt(id) ON DELETE CASCADE
         )
         """)
-
 
 if __name__ == "__main__":
     create_tables()

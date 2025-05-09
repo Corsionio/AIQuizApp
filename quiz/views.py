@@ -147,6 +147,16 @@ def start_quiz(request):
         })
 
     request.session['quiz_qnums'] = [q['qnum'] for q in quiz_questions]
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO quiz_quizattempt (user_id, score, total, taken_at)
+            VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+        """, [request.user.id, 0, len(quiz_questions)])
+    attempt_id = cursor.lastrowid
+
+    request.session['current_attempt_id'] = attempt_id
+
     return render(request, 'quiz/quiz.html', {'questions': quiz_questions})
 
 @login_required
@@ -199,13 +209,6 @@ def submit_quiz(request):
                 save_to_db()
 
 
-        # Save this quiz attempt
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO quiz_quizattempt (user_id, score, total, taken_at)
-                VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
-            """, [request.user.id, score, len(questions)])
-
         # BASIC FUNCTION AGGREGATE **************************************************************************************
         # Calculate average score over all past attempts
         with connection.cursor() as cursor:
@@ -231,16 +234,17 @@ def submit_quiz(request):
 def vote_question(request, qnum, vote_value):
     user_id = request.user.id
     vote_value = 1 if vote_value == 'up' else 0
+    attempt_id = request.session.get('current_attempt_id')
+
+    if not attempt_id:
+        return JsonResponse({"status": "error", "message": "No active quiz attempt."})
 
     with connection.cursor() as cursor:
-        # Insert or replace vote
         cursor.execute("""
-            INSERT INTO quiz_questionvote (user_id, qnum_id, vote)
-            VALUES (%s, %s, %s)
-            ON CONFLICT(user_id, qnum_id) DO UPDATE SET vote = excluded.vote
-        """, [user_id, qnum, vote_value])
+            INSERT INTO quiz_questionvote (user_id, qnum_id, vote, attempt_id)
+            VALUES (%s, %s, %s, %s)
+        """, [user_id, qnum, vote_value, attempt_id])
 
-        # Recalculate trust rating as average
         cursor.execute("""
             UPDATE quiz_question
             SET trust_rating = (
