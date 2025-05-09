@@ -14,6 +14,9 @@ ALLOWED_HOSTS = [
     'codequestions-h0bkfkbvckdwaxfv.eastus-01.azurewebsites.net',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://codequestions-h0bkfkbvckdwaxfv.eastus-01.azurewebsites.net',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
