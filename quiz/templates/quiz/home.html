@@ -53,9 +53,45 @@
         .home-content button:hover {
             background: #ff8050;
         }
+
+        /* Social buttons in top-right */
+        .social-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .social-links a {
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .social-links button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .social-links button:hover {
+            background: #555;
+        }
     </style>
 </head>
 <body>
+    <!-- ✅ TOP-RIGHT SOCIAL BUTTONS -->
+    <div class="social-links">
+        <a href="https://github.com/Corsionio" target="_blank">
+            <button type="button">GitHub</button>
+        </a>
+        <a href="https://www.linkedin.com/in/corsomontuori/" target="_blank">
+            <button type="button">LinkedIn</button>
+        </a>
+    </div>
+
     <div class="home-content">
         <h1>Welcome to the Quiz App</h1>
 
@@ -66,14 +102,13 @@
             </form>
 
             {% if user.is_staff %}
-            <br>
-            <a href="{% url 'quiz:manage_questions' %}">Manage Questions (Admin)</a>
-            <a href="{% url 'quiz:manage_users' %}">Manage Users (Admin)</a>
+                <br>
+                <a href="{% url 'quiz:manage_questions' %}">Manage Questions (Admin)</a>
+                <a href="{% url 'quiz:manage_users' %}">Manage Users (Admin)</a>
             {% endif %}
 
             <br>
             <a href="{% url 'quiz:logout' %}">Logout</a>
-
         {% else %}
             <a href="{% url 'quiz:login' %}">Login</a>
             <a href="{% url 'quiz:register' %}">Register</a>

@@ -6,6 +6,8 @@ from .forms import RegisterForm, LoginForm
 from .generate_question import save_to_db
 from django.views.decorators.http import require_POST
 from django.db import connection
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 import random
 import json
 import os
@@ -49,8 +51,13 @@ def logout_view(request):
 @staff_member_required
 def manage_questions(request):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT qnum, text FROM quiz_question")
-        questions = [{'qnum': row[0], 'text': row[1]} for row in cursor.fetchall()]
+        cursor.execute("""
+            SELECT q.qnum, q.text, COUNT(v.id) as vote_count
+            FROM quiz_question q
+            LEFT JOIN quiz_questionvote v ON q.qnum = v.qnum_id
+            GROUP BY q.qnum, q.text
+        """)
+        questions = [{'qnum': row[0], 'text': row[1], 'vote_count': row[2]} for row in cursor.fetchall()]
     return render(request, 'quiz/manage_questions.html', {'questions': questions})
 
 @staff_member_required
@@ -153,14 +160,15 @@ def submit_quiz(request):
         with connection.cursor() as cursor:
             format_strings = ','.join(['%s'] * len(quiz_qnums))
             cursor.execute(f"""
-                SELECT q.qnum, q.text, q.trust_rating, q.wrong_answers, r.text
+                SELECT q.qnum, q.text, q.trust_rating, q.wrong_answers, r.text, q.explanation,
+                    (SELECT COUNT(*) FROM quiz_questionvote v WHERE v.qnum_id = q.qnum) as vote_count
                 FROM quiz_question q
                 JOIN quiz_rightanswer r ON q.qnum = r.qnum_id
                 WHERE q.qnum IN ({format_strings})
             """, quiz_qnums)
             questions = cursor.fetchall()
 
-        for qnum, text, trust_rating, wrong_answers, correct in questions:
+        for qnum, text, trust_rating, wrong_answers, correct, explanation, vote_count in questions:
             selected = request.POST.get(f"question_{qnum}")
 
             with connection.cursor() as cursor:
@@ -183,12 +191,13 @@ def submit_quiz(request):
                 'selected': selected,
                 'correct': correct,
                 'is_correct': is_correct,
-                'explanation': generate_explanation(text, correct)
+                'explanation': explanation
             })
 
-            if new_trust < 0.6:
+            if vote_count >= 3 and trust_rating < 0.6:
                 delete_question(request, qnum)
                 save_to_db()
+
 
         # Save this quiz attempt
         with connection.cursor() as cursor:
@@ -216,24 +225,30 @@ def submit_quiz(request):
 
     return redirect('quiz:home')
 
-# YouTube videos that helped write this code
-# OpenAi API help: https://www.youtube.com/watch?v=YVFWBJ1WVF8
-# Ollama (another ai generate but not used in the project) help: https://www.youtube.com/watch?v=E4l91XKQSgw&t=413s
-def generate_explanation(question, correct_answer):
-    prompt = (
-        f"Look at the question and correct answer from a multiple choice test and explain the reasoning of why an answer is correct\n"
-        f"Question: {question}\n"
-        f"Correct Answer: {correct_answer}"
-    )
+@csrf_exempt
+@login_required
+@require_POST
+def vote_question(request, qnum, vote_value):
+    user_id = request.user.id
+    vote_value = 1 if vote_value == 'up' else 0
 
-    try:
-        reasoning = client.chat.completions.create(
-            model = "gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=150,
-            temperature=0.8,
-        )
-        explanation = reasoning.choices[0].message.content.strip()
-        return explanation
-    except Exception:
-        return f"No response available at the time"
+    with connection.cursor() as cursor:
+        # Insert or replace vote
+        cursor.execute("""
+            INSERT INTO quiz_questionvote (user_id, qnum_id, vote)
+            VALUES (%s, %s, %s)
+            ON CONFLICT(user_id, qnum_id) DO UPDATE SET vote = excluded.vote
+        """, [user_id, qnum, vote_value])
+
+        # Recalculate trust rating as average
+        cursor.execute("""
+            UPDATE quiz_question
+            SET trust_rating = (
+                SELECT AVG(vote * 1.0)
+                FROM quiz_questionvote
+                WHERE qnum_id = quiz_question.qnum
+            )
+            WHERE qnum = %s
+        """, [qnum])
+
+    return JsonResponse({"status": "success"})

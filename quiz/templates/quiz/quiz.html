@@ -1,4 +1,5 @@
 <!--Had to get rid of the style.css for this because it was cutting off the questions and I couldn't figure out where it was messing up-->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,6 +60,31 @@
         .submit-btn:hover {
             background-color: #ff7a4d;
         }
+
+        .vote-buttons button {
+            margin-left: 6px;
+        }
+
+
+        .vote-buttons button {
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .vote-icon {
+            height: 25px;
+            width: 25px;
+            vertical-align: middle;
+            transition: transform 0.2s;
+        }
+
+
+        .vote-buttons button:hover {
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
@@ -69,16 +95,76 @@
 
         {% for question in questions %}
             <div class="question-block">
-                <div class="question-text">{{ forloop.counter }}. {{ question.text }}</div>
+                <div class="question-header">
+                    <span class="question-text">{{ forloop.counter }}. {{ question.text }}</span>
+                    <span class="vote-buttons">
+                        <button type="button" class="vote-btn-{{ question.qnum }}" onclick="submitVote('{{ question.qnum }}', 'up')">
+                            <img src="{% static 'images/greenarrow.png' %}" alt="Upvote" class="vote-icon">
+                        </button>
+                        <button type="button" class="vote-btn-{{ question.qnum }}" onclick="submitVote('{{ question.qnum }}', 'down')">
+                            <img src="{% static 'images/redarrow.png' %}" alt="Downvote" class="vote-icon">
+                        </button>
+                    </span>
+                </div>
+
+
+            
                 {% for option in question.option_list %}
                     <label class="option">
                         <input type="radio" name="question_{{ question.qnum }}" value="{{ option }}"> {{ option }}
                     </label>
-                {% endfor %}
-            </div>
+            {% endfor %}
+        </div>
+        
         {% endfor %}
 
         <button type="submit" class="submit-btn">Submit Quiz</button>
+        <div id="loading-spinner" style="display: none; text-align: center; margin-top: 20px;">
+            <img src="{% static 'images/spinner.gif' %}" alt="Loading..." style="height: 50px;">
+            <p>Processing your answers...</p>
+        </div>
     </form>
+
+    <script>
+        function submitVote(qnum, vote) {
+            const voteKey = `voted_${qnum}`;
+            if (sessionStorage.getItem(voteKey)) {
+                alert("You’ve already voted on this question during this quiz.");
+                return;
+            }
+        
+            fetch(`/vote/${vote}/${qnum}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert("Vote submitted!");
+                    document.querySelectorAll(`.vote-btn-${qnum}`).forEach(btn => {
+                        btn.disabled = true;
+                        btn.style.opacity = 0.5;
+                        btn.style.cursor = "not-allowed";
+                    });
+                    sessionStorage.setItem(voteKey, true); // record the vote
+                } else {
+                    alert("Error submitting vote.");
+                }
+            });
+        }
+    </script>  
+    
+    <script>
+        function showLoading() {
+            // Disable the submit button
+            document.querySelector(".submit-btn").disabled = true;
+            document.querySelector(".submit-btn").textContent = "Submitting...";
+        
+            // Show loading spinner
+            document.getElementById("loading-spinner").style.display = "block";
+        }
+        </script>        
 </body>
 </html>

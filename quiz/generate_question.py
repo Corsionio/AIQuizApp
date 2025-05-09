@@ -76,19 +76,44 @@ def generate_code_question():
         print("Cleaned content was:\n", cleaned if 'cleaned' in locals() else content)
         return None
 
+def generate_explanation(question, correct_answer):
+    prompt = (
+        f"Look at the question and correct answer from a multiple choice test and explain the reasoning of why an answer is correct\n"
+        f"Question: {question}\n"
+        f"Correct Answer: {correct_answer}"
+    )
+
+    try:
+        reasoning = client.chat.completions.create(
+            model = "gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=150,
+            temperature=0.8,
+        )
+        explanation = reasoning.choices[0].message.content.strip()
+        return explanation
+    except Exception:
+        return f"No response available at the time"
+    
 def save_to_db():
     data = generate_code_question()
     if data:
+        question_text = data["question"]
+        correct_answer = data["correct_answer"]
+        wrong_answers_json = json.dumps(data["wrong_answers"])
+
+        explanation = generate_explanation(question_text, correct_answer)
+
         with connection.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO quiz_question (text, wrong_answers, trust_rating) VALUES (%s, %s, 1.0) RETURNING qnum",
-                [data["question"], json.dumps(data["wrong_answers"])]
+                "INSERT INTO quiz_question (text, wrong_answers, trust_rating, explanation) VALUES (%s, %s, %s, %s) RETURNING qnum",
+                [question_text, wrong_answers_json, 1.0, explanation]
             )
             qnum = cursor.fetchone()[0]
 
             cursor.execute(
                 "INSERT INTO quiz_rightanswer (qnum_id, text) VALUES (%s, %s)",
-                [qnum, data["correct_answer"]]
+                [qnum, correct_answer]
             )
         return True
     else:

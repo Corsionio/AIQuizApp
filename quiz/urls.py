@@ -16,4 +16,5 @@ urlpatterns = [
     path('promote-user/<int:user_id>/', views.promote_user, name='promote_user'),
     path('delete-all-questions/', views.delete_all_questions, name='delete_all_questions'),
     path('generate-questions/', views.generate_questions, name='generate_questions'),
+    path('vote/<str:vote_value>/<int:qnum>/', views.vote_question, name='vote_question'),
 ]

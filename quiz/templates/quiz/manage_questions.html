@@ -11,7 +11,7 @@
             <form action="{% url 'quiz:home' %}" method="get">
                 <button type="submit">[ Back to Home ]</button>
             </form>
-        </div>           
+        </div>     
 
         <form method="post" action="{% url 'quiz:delete_all_questions' %}" style="display:inline;">
             {% csrf_token %}
@@ -28,6 +28,7 @@
             {% for q in questions %}
                 <li>
                     <strong>{{ q.qnum }}:</strong> {{ q.text|truncatechars:80 }}
+                    <span style="margin-left: 10px; color: gray;">[Votes: {{ q.vote_count }}]</span>
                     <form method="post" action="{% url 'quiz:delete_question' q.qnum %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" onclick="return confirm('Delete this question?')">Delete</button>

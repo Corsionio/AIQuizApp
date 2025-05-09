@@ -32,7 +32,8 @@ def create_tables():
             qnum INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
             wrong_answers TEXT NOT NULL,
-            trust_rating FLOAT NOT NULL DEFAULT 0.0
+            trust_rating FLOAT NOT NULL DEFAULT 0.0,
+            explanation TEXT
         )
         """)
 
@@ -54,6 +55,19 @@ def create_tables():
             FOREIGN KEY(user_id) REFERENCES quiz_user(id) ON DELETE CASCADE
         )
         """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS quiz_questionvote (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            qnum_id INTEGER NOT NULL,
+            vote INTEGER NOT NULL CHECK(vote IN (0, 1)),
+            UNIQUE(user_id, qnum_id),
+            FOREIGN KEY(user_id) REFERENCES quiz_user(id) ON DELETE CASCADE,
+            FOREIGN KEY(qnum_id) REFERENCES quiz_question(qnum) ON DELETE CASCADE
+        )
+        """)
+
 
 if __name__ == "__main__":
     create_tables()
