@@ -10,7 +10,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'codequestions-h0bkfkbvckdwaxfv.eastus-01.azurewebsites.net',
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
