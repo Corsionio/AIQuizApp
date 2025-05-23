@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'quiz',  
+    'quiz.apps.QuizConfig',  
 ]
 
 AUTH_USER_MODEL = 'quiz.User'
