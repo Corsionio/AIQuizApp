@@ -5,6 +5,7 @@ import django
 from dotenv import load_dotenv
 from openai import OpenAI
 from django.db import connection
+from quiz.models import Question, RightAnswer
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
@@ -104,21 +105,15 @@ def save_to_db():
 
         explanation = generate_explanation(question_text, correct_answer)
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO quiz_question (text, wrong_answers, trust_rating, explanation) VALUES (%s, %s, %s, %s) RETURNING qnum",
-                [question_text, wrong_answers_json, 1.0, explanation]
-            )
-            qnum = cursor.fetchone()[0]
-
-            cursor.execute(
-                "INSERT INTO quiz_rightanswer (qnum_id, text) VALUES (%s, %s)",
-                [qnum, correct_answer]
-            )
+        question = Question.objects.create(
+            text=question_text,
+            wrong_answers=wrong_answers_json,
+            trust_rating=1.0,
+            explanation=explanation
+        )
+        RightAnswer.objects.create(qnum=question, text=correct_answer)
         return True
-    else:
-        print("Failed to generate question.")
-        return False
+    return False
     
 def clean_answer(text):
     return str(text).strip().strip("[]\"'")
