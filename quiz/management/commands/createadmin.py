@@ -8,9 +8,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         User = get_user_model()
 
-        username = os.getenv("ADMIN_USERNAME")
-        password = os.getenv("ADMIN_PASSWORD")
-        email = os.getenv("ADMIN_EMAIL")
+        username = os.getenv("DJANGO_ADMIN_USERNAME")
+        password = os.getenv("DJANGO_ADMIN_PASSWORD")
+        email = os.getenv("DJANGO_ADMIN_EMAIL")
 
         if not all([username, password, email]):
             self.stdout.write(self.style.WARNING("Missing ADMIN_* environment variables"))
@@ -18,6 +18,6 @@ class Command(BaseCommand):
 
         if not User.objects.filter(username=username).exists():
             User.objects.create_superuser(username=username, email=email, password=password)
-            self.stdout.write(self.style.SUCCESS(f"✅ Admin user '{username}' created."))
+            self.stdout.write(self.style.SUCCESS(f"Admin user '{username}' created."))
         else:
             self.stdout.write(self.style.NOTICE(f"ℹ Admin user '{username}' already exists."))
