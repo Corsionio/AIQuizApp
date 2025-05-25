@@ -11,6 +11,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
     'codequestions-h0bkfkbvckdwaxfv.eastus-01.azurewebsites.net',
 ]
 

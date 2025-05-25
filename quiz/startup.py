@@ -3,12 +3,19 @@ from django.contrib.auth import get_user_model
 
 def create_default_admin():
     User = get_user_model()
-    username = os.getenv("ADMIN_USERNAME", "admin")
-    password = os.getenv("ADMIN_PASSWORD", "admin123")
-    email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+
+    username = os.getenv("DJANGO_ADMIN_USERNAME")
+    password = os.getenv("DJANGO_ADMIN_PASSWORD")
+    email = os.getenv("DJANGO_ADMIN_EMAIL")
+
+    # Only proceed if all environment variables are set
+    if not all([username, password, email]):
+        print("Skipping admin creation: Missing DJANGO_ADMIN_USERNAME, DJANGO_ADMIN_PASSWORD, or DJANGO_ADMIN_EMAIL")
+        return
 
     if not User.objects.filter(username=username).exists():
         print(f"Creating default admin: {username}")
-        user = User.objects.create_superuser(username=username, email=email, password=password)
+        User.objects.create_superuser(username=username, password=password, email=email)
     else:
-        print("Default admin already exists.")
+        print(f"Admin user '{username}' already exists.")
+

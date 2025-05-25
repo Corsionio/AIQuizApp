@@ -12,14 +12,15 @@ if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 
     try:
-        from django.core.management import execute_from_command_line
-
-        # Run Django commands first
-        execute_from_command_line(sys.argv)
+        import django
+        django.setup()
 
         # Only call admin setup for runserver
         if len(sys.argv) >= 2 and sys.argv[1] == "runserver":
             run_setup_hook()
+
+        from django.core.management import execute_from_command_line
+        execute_from_command_line(sys.argv)
 
     except ImportError as exc:
         raise ImportError(
