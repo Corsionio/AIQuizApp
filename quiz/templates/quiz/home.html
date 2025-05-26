@@ -14,6 +14,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
+            position: relative;
         }
 
         .home-content {
@@ -54,11 +55,21 @@
             background: #ff8050;
         }
 
-        /* Social buttons in top-right */
         .social-links {
-            position: absolute;
+        position: absolute;
+        right: 20px;
+        }
+
+        .social-links:nth-of-type(1) {
             top: 20px;
-            right: 20px;
+        }
+
+        .social-links:nth-of-type(2) {
+            top: 70px; /* 20px + height (~40px) + 10px gap */
+        }
+
+        .social-links:nth-of-type(3) {
+            top: 120px; /* repeat based on stacking height */
         }
 
         .social-links a {
@@ -82,13 +93,24 @@
     </style>
 </head>
 <body>
-    <!-- ✅ TOP-RIGHT SOCIAL BUTTONS -->
     <div class="social-links">
         <a href="https://github.com/Corsionio" target="_blank">
             <button type="button">GitHub</button>
         </a>
         <a href="https://www.linkedin.com/in/corsomontuori/" target="_blank">
             <button type="button">LinkedIn</button>
+        </a>
+    </div>
+    
+    <div class = "social-links">
+        <a href="https://github.com/ethancw24" target="_blank">
+            <button type="button">GitHub</button>
+        </a>
+    </div>
+    
+    <div class = "social-links">
+        <a href="https://github.com/Colby-Leavitt" target="_blank">
+            <button type="button">GitHub</button>
         </a>
     </div>
 
