@@ -120,17 +120,13 @@
             text-decoration: none;
             cursor: pointer;
         }
-
-        .guest-button:hover {
-            background: #4cffcc;
-        }
+        
     </style>
 </head>
 <body>
     <div class="page-wrapper">
         <div class="container">
             <div class="form-container" id="formContainer">
-                <!-- Sign up Form -->
                 <form class="form-box" id="registerBox" method="post" action="{% url 'quiz:auth' %}">
                     {% csrf_token %}
                     <h2>Sign Up</h2>
@@ -147,7 +143,6 @@
                     <button type="submit">Sign Up</button>
                 </form>
 
-                <!-- Login Form -->
                 <form class="form-box" id="loginBox" method="post" action="{% url 'quiz:auth' %}">
                     {% csrf_token %}
                     <h2>Login</h2>
@@ -157,13 +152,11 @@
                 </form>
             </div>
 
-            <!-- Toggle Button -->
             <div class="toggle-container" onclick="toggleForm()" id="toggleBtn">
                 Already have an account? Login
             </div>
         </div>
 
-        <!-- Guest Quiz Button Styled Like Signup/Login -->
         <a href="{% url 'quiz:home' %}" class="guest-button">Take Quiz as Guest</a>
     </div>
 
