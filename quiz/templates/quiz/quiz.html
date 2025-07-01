@@ -114,9 +114,12 @@
 </head>
 <body>
     <h1>Time to take your quiz!</h1>
-    <form action="{% url 'quiz:home' %}" method="get" style="text-align:center; margin-top: 20px;">
-        <button type="submit" class="submit-btn" style="background-color: #ccc; color: black;">Back to Home</button>
+    <form action="{% url 'quiz:home' %}" method="get" style="text-align: center; margin-top: 30px;">
+        <button type="submit" class="submit-btn" style="background-color: coral; color: #93FFe0;">
+            Back to Home
+        </button>
     </form>
+
 
 
     <form method="post" action="{% url 'quiz:submit_quiz' %}" onsubmit="showLoading()">

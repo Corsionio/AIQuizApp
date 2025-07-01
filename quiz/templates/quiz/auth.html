@@ -152,6 +152,20 @@
             : "Already have an account? Login";
         }
         </script>
+        <form action="{% url 'quiz:home' %}" method="get" style="width: 100%; margin-top: 10px;">
+        <button type="submit" style="
+                width: 100%;
+                padding: 12px;
+                background: coral;
+                color: #93FFe0;
+                border: none;
+                border-radius: 5px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            ">Take Quiz as Guest</button>
+        </form>
+
     </body>
 
 </html>
