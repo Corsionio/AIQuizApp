@@ -71,7 +71,9 @@
     <h1>Quiz Results!</h1>
     <div class="score-summary">
         <p><strong>Your Score:</strong> {{ score }} / {{ total }}</p>
-        <p><strong>All-time Average:</strong> {{ avg|floatformat:2 }}%</p>
+        {% if avg is not None %}
+            <p><strong>All-time Average:</strong> {{ avg|floatformat:2 }}%</p>
+        {% endif %}
     </div>
 
     <h2 style="text-align:center;">Question Review:</h2>

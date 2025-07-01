@@ -19,7 +19,6 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
-@login_required
 def home(request):
     return render(request, 'quiz/home.html')
 
@@ -94,7 +93,6 @@ def promote_user(request, user_id):
         Admin.objects.get_or_create(user=user)
     return redirect('quiz:manage_users')
 
-@login_required
 def start_quiz(request):
     all_questions = list(Question.objects.all())
     random.shuffle(all_questions)
@@ -108,12 +106,16 @@ def start_quiz(request):
         random.shuffle(options)
         quiz_questions.append({'qnum': q.qnum, 'text': q.text, 'option_list': options})
 
-    attempt = QuizAttempt.objects.create(user=request.user, score=0, total=len(quiz_questions))
     request.session['quiz_qnums'] = [q['qnum'] for q in quiz_questions]
-    request.session['current_attempt_id'] = attempt.id
+
+    if request.user.is_authenticated:
+        attempt = QuizAttempt.objects.create(user=request.user, score=0, total=len(quiz_questions))
+        request.session['current_attempt_id'] = attempt.id
+    else:
+        request.session['current_attempt_id'] = None
+
     return render(request, 'quiz/quiz.html', {'questions': quiz_questions})
 
-@login_required
 def submit_quiz(request):
     if request.method == 'POST':
         quiz_qnums = request.session.get('quiz_qnums', [])
@@ -147,13 +149,21 @@ def submit_quiz(request):
                 q.delete()
                 save_to_db()
 
-        avg = QuizAttempt.objects.filter(user=request.user).aggregate(avg=Avg('score') * 1.0 / Avg('total'))['avg'] or 0.0
+        # Calculate average only for logged-in users
+        if request.user.is_authenticated:
+            avg = QuizAttempt.objects.filter(user=request.user).aggregate(
+                avg=Avg('score') * 1.0 / Avg('total')
+            )['avg'] or 0.0
+        else:
+            avg = None
+
         return render(request, 'quiz/result.html', {
             'score': score,
             'total': len(questions),
             'results': results,
-            'avg': avg * 100
+            'avg': avg * 100 if avg is not None else None
         })
+
     return redirect('quiz:home')
 
 @staff_member_required

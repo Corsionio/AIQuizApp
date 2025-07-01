@@ -114,6 +114,10 @@
 </head>
 <body>
     <h1>Time to take your quiz!</h1>
+    <form action="{% url 'quiz:home' %}" method="get" style="text-align:center; margin-top: 20px;">
+        <button type="submit" class="submit-btn" style="background-color: #ccc; color: black;">Back to Home</button>
+    </form>
+
 
     <form method="post" action="{% url 'quiz:submit_quiz' %}" onsubmit="showLoading()">
         {% csrf_token %}
@@ -144,7 +148,6 @@
         {% endfor %}
 
         <button type="submit" class="submit-btn">Submit Quiz</button>
-        <!-- Fullscreen loading overlay -->
         <div id="loading-spinner" style="display: none;">
             <div class="spinner-overlay">
                 <div class="spinner-content">

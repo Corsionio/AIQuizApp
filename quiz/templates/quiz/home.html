@@ -132,9 +132,12 @@
             <br>
             <a href="{% url 'quiz:logout' %}">Logout</a>
         {% else %}
-            <a href="{% url 'quiz:login' %}">Login</a>
-            <a href="{% url 'quiz:register' %}">Register</a>
+            <form action="{% url 'quiz:start_quiz' %}" method="get" style="margin-bottom: 10px;">
+                <button type="submit">Take Quiz as Guest</button>
+            </form>
+            <a href="{% url 'quiz:auth' %}">Login / Register</a>
         {% endif %}
+
     </div>
 </body>
 </html>
