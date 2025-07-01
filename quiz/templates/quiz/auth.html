@@ -141,20 +141,19 @@
         </div>
 
         <div style="text-align: center; margin-top: 5px;">
-            <form action="{% url 'quiz:home' %}" method="get">
-                <button type="submit" style="
-                    background: none;
-                    border: none;
-                    color: #93FFe0;
-                    font-size: 14px;
-                    text-decoration: none;
-                    cursor: pointer;
-                    font-weight: bold;
-                " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
-                    Take Quiz as Guest
-                </button>
-            </form>
-            </div>
+            <a href="{% url 'quiz:home' %}" style="
+                background: none;
+                color: #93FFe0;
+                font-size: 14px;
+                font-weight: bold;
+                text-decoration: none;
+                border: none;
+                cursor: pointer;
+            " onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                Take Quiz as Guest
+            </a>
+        </div>
+
 
         
         <script>
